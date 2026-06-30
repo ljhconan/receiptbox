@@ -3,6 +3,27 @@ import { useState, useEffect, useRef } from "react";
 const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
+async function compressImage(file) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const MAX = 1200;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.75);
+    };
+    img.src = url;
+  });
+}
+
 async function callClaude(b64, mimeType) {
   const res = await fetch("/api/parse", {
     method: "POST",
@@ -96,13 +117,14 @@ export default function App() {
     setError("");
     setLoading(true);
     try {
+      const compressed = await compressImage(file);
       const b64 = await new Promise((res, rej) => {
         const reader = new FileReader();
         reader.onload = () => res(reader.result.split(",")[1]);
         reader.onerror = rej;
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(compressed);
       });
-      const extracted = await callClaude(b64, file.type || "image/jpeg");
+      const extracted = await callClaude(b64, "image/jpeg");
       setReviewing({ ...extracted, id: uid(), clientId: "", clientName: "", projectNote: "" });
     } catch {
       setError("识别失败，请重试。建议光线充足、小票放平拍摄。");
