@@ -327,65 +327,85 @@ function ScanScreen({ onImage, fileRef, error }) {
   };
 
   return (
-    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"16px 20px 20px", gap:12, overflow:"hidden" }}>
-      <div style={{ fontSize:22, fontWeight:700, color:C.black, flexShrink:0 }}>扫一张，存一张</div>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"16px 20px 20px", gap:10, overflow:"hidden" }}>
 
-      {/* Camera viewfinder — grows to fill space */}
+      {/* Title */}
+      <div style={{ flexShrink:0 }}>
+        <div style={{ fontSize:10, fontWeight:700, color:C.orange, letterSpacing:1.5, marginBottom:6 }}>CONTRACTOR RECEIPTS</div>
+        <div style={{ fontSize:32, fontWeight:800, color:C.black, lineHeight:1.05, letterSpacing:-1 }}>
+          扫一张<br/>
+          <span style={{ color:C.orange }}>存一张</span>
+        </div>
+      </div>
+
+      {/* Camera viewfinder — fixed height */}
       <div onClick={() => pick(true)}
-        style={{ flex:1, background:C.dark, borderRadius:18, display:"flex", flexDirection:"column",
-          alignItems:"center", justifyContent:"center", gap:14, cursor:"pointer", position:"relative",
-          overflow:"hidden", minHeight:200 }}>
-        {/* Corner brackets */}
-        {[[{top:14,left:14},["Top","Left"]],[{top:14,right:14},["Top","Right"]],
-          [{bottom:14,left:14},["Bottom","Left"]],[{bottom:14,right:14},["Bottom","Right"]]
+        style={{ flexShrink:0, height:160, background:C.dark, borderRadius:16,
+          display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+          gap:8, cursor:"pointer", position:"relative", overflow:"hidden" }}>
+        {[[{top:10,left:10},["Top","Left"]],[{top:10,right:10},["Top","Right"]],
+          [{bottom:10,left:10},["Bottom","Left"]],[{bottom:10,right:10},["Bottom","Right"]]
         ].map(([pos, sides], i) => (
-          <div key={i} style={{ position:"absolute", width:20, height:20,
+          <div key={i} style={{ position:"absolute", width:16, height:16,
             [`border${sides[0]}`]: `2px solid rgba(255,255,255,0.4)`,
             [`border${sides[1]}`]: `2px solid rgba(255,255,255,0.4)`,
             borderRadius: i===0?"3px 0 0 0":i===1?"0 3px 0 0":i===2?"0 0 0 3px":"0 0 3px 0",
             ...pos }} />
         ))}
-        {/* Camera icon — clean outline circle */}
-        <div style={{ width:64, height:64, borderRadius:"50%",
-          border:`1.5px solid rgba(255,255,255,0.25)`,
+        <div style={{ width:40, height:40, borderRadius:"50%",
+          border:`1.5px solid rgba(249,115,22,0.5)`,
           display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <IconCamera size={28} color="rgba(255,255,255,0.9)" strokeWidth={1.5} />
+          <IconCamera size={20} color="rgba(255,255,255,0.9)" strokeWidth={1.5} />
         </div>
-        <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:15, color:"rgba(255,255,255,0.9)", fontWeight:500 }}>点击拍照识别</div>
-          <div style={{ fontSize:12, color:"rgba(255,255,255,0.4)", marginTop:4 }}>对准小票，保持平整</div>
-        </div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.85)", fontWeight:500 }}>点击拍照识别</div>
+        <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>对准小票，保持平整</div>
       </div>
 
-      {/* From gallery */}
+      {/* Gallery — bigger orange button */}
       <div onClick={() => pick(false)}
-        style={{ flexShrink:0, background:C.white, borderRadius:14, padding:"13px 18px",
-          display:"flex", alignItems:"center", gap:12, cursor:"pointer", border:`1px solid ${C.border}` }}>
-        <IconPhoto size={20} color={C.mid} />
-        <span style={{ fontSize:14, color:C.dark, fontWeight:500 }}>从相册上传</span>
+        style={{ flexShrink:0, background:C.orange, borderRadius:14, padding:"16px 18px",
+          display:"flex", alignItems:"center", gap:12, cursor:"pointer" }}>
+        <div style={{ width:36, height:36, background:"rgba(255,255,255,0.15)", borderRadius:10,
+          display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+          <IconPhoto size={18} color="#fff" />
+        </div>
+        <div>
+          <div style={{ fontSize:14, color:"#fff", fontWeight:700 }}>从相册上传</div>
+          <div style={{ fontSize:11, color:"rgba(255,255,255,0.65)", marginTop:1 }}>选择已拍好的小票照片</div>
+        </div>
       </div>
 
       <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }}
         onChange={(e) => onImage(e.target.files?.[0])} />
 
       {error && (
-        <div style={{ flexShrink:0, padding:14, background:"#FEF2F2", border:`1px solid #FECACA`, borderRadius:12, color:C.red, fontSize:13 }}>
+        <div style={{ flexShrink:0, padding:12, background:"#FEF2F2",
+          border:`1px solid #FECACA`, borderRadius:12, color:C.red, fontSize:13 }}>
           ⚠️ {error}
         </div>
       )}
 
-      {/* Stores — compact */}
-      <div style={{ flexShrink:0, display:"flex", alignItems:"center", gap:8 }}>
-        <span style={{ fontSize:11, color:C.mid }}>适用：</span>
+      {/* Tips */}
+      <div style={{ flexShrink:0, background:C.white, borderRadius:12, padding:"12px 14px", border:`1px solid ${C.border}` }}>
+        <div style={{ fontSize:10, fontWeight:600, color:C.mid, marginBottom:6 }}>拍照小贴士</div>
+        {["光线充足，避免阴影遮住金额","小票放平，避免折叠遮住明细","长小票可分段拍多张"].map((t, i) => (
+          <div key={i} style={{ display:"flex", gap:6, fontSize:12, color:"#374151", marginBottom: i<2?4:0 }}>
+            <span style={{ color:C.orange, fontWeight:700, flexShrink:0 }}>✓</span>{t}
+          </div>
+        ))}
+      </div>
+
+      {/* Stores */}
+      <div style={{ flexShrink:0, display:"flex", alignItems:"center", gap:6 }}>
+        <span style={{ fontSize:10, color:C.mid }}>适用：</span>
         {["Home Depot", "Lowe's", "五金建材店"].map((s) => (
-          <span key={s} style={{ fontSize:11, color:"#374151", background:C.white,
-            border:`1px solid ${C.border}`, padding:"3px 10px", borderRadius:20 }}>{s}</span>
+          <span key={s} style={{ fontSize:10, color:"#374151", background:C.white,
+            border:`1px solid ${C.border}`, padding:"3px 9px", borderRadius:20 }}>{s}</span>
         ))}
       </div>
     </div>
   );
 }
-
 // ── Review Screen ─────────────────────────────────────────────────────────────
 function ReviewScreen({ receipt, clients, onSave, onAddClient, onCancel, onChange }) {
   const [newClientName, setNewClientName] = useState("");
